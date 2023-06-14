@@ -1,8 +1,11 @@
 const express = require('express')
+const jwt = require('jsonwebtoken')
 const {getAll,  getById, post, put, patch, patchCategories, createImage} = require('../controllers/products.js')
 const router = express.Router()
+const {restNeedsAuth} = require('../utils/auth.js')
 
-router.get('/', getAll)
+//router.use(needsAuth)
+router.get('/', restNeedsAuth,  getAll)
 router.get('/:id', getById)
 router.post('/', post)
 router.put('/:id', put)

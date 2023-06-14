@@ -9,14 +9,14 @@ const ifProductExistsThenExecute = async (res, id, fn) => {
             message:'Product not found'
         })
     } else {
-        return fn(id)
+        return fn(product)
     }
 }
 
 const getAll = async(req, res) => {
     const {categoryId} = req.query
     const products = await Products.findAll()
-    
+    console.log(res.locals.user)
     return res.send( {
         success: true,
         products 
@@ -25,11 +25,13 @@ const getAll = async(req, res) => {
 
 const getById = async (req, res) => {
     const {id} = req.params
-    const product = await Products.findById({id})
-    return res.send({
-        success: true,
-        product
-    })
+
+    return await ifProductExistsThenExecute(res, id, product => {
+            return res.send({
+                success: true,
+                product
+            })
+        })
 }
 
 const post = async(req, res) => {
@@ -43,7 +45,7 @@ const post = async(req, res) => {
 
 const put = async(req, res) => {
     const {id} = req.params
-    return await ifProductExistsThenExecute(res, id, async () => {
+    return await ifProductExistsThenExecute(res, id, async (_) => {
         const {price, product} = req.body
         Products.update({id, price, product})
         return res.send({
@@ -64,7 +66,7 @@ const patch = async(req, res) => {
 
 const patchCategories = async(req, res) => {
     const id = parseInt(req.params.id)
-    return  await ifProductExistsThenExecute(res, id, async () => {
+    return  await ifProductExistsThenExecute(res, id, async (_) => {
         const {categories} = req.body
    
         try {
@@ -83,7 +85,7 @@ const patchCategories = async(req, res) => {
 
 const createImage = async (req, res) => {
     const {id} = req.params
-    return await ifProductExistsThenExecute(res, id, async() => {
+    return await ifProductExistsThenExecute(res, id, async(_) => {
         const {url, description} = req.body
         const imageId = await Products.addImage({url, description, product_id:id})
        

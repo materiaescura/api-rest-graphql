@@ -1,7 +1,7 @@
-const {ApolloError} = require('apollo-server-express')
+const {ApolloError, AuthenticationError} = require('apollo-server-express')
 const {Products} = require('../../db/index.js')
 
-const getAllProducts = async (context, {filter}) => {
+const getAllProducts = async (parent, {filter}, context) => {
     
     const products = filter?.categoryId
                     ? await Products.findAllByCategory({categoryId: filter.categoryId})
@@ -10,7 +10,7 @@ const getAllProducts = async (context, {filter}) => {
     return products
 }
 
-const createProduct =  async (context, {input}) => {
+const createProduct =  async (parent, {input}, context) => {
     const {product, price} = input
     const [{insertId}] = await Products.create({product, price})
     console.log(insertId)
@@ -20,12 +20,12 @@ const createProduct =  async (context, {input}) => {
     }
 }
 
-const deleteProduct = async(context, {id}) => {
+const deleteProduct = async(parent, {id}, context) => {
     await Products.remove({id})
     return true
 }
 
-const updateProduct = async(context, {id, input}) => {
+const updateProduct = async(parent, {id, input}, context) => {
     
     const oldProduct = await Products.findById({id})
 
@@ -62,7 +62,7 @@ const filterInput = input => {
     return [productProps, categories]
 }
 
-const createImageOnProduct = async (context, {productId, input}) => {
+const createImageOnProduct = async (parent, {productId, input}, context) => {
     const {url, description} = input
     
     try {
@@ -76,7 +76,7 @@ const createImageOnProduct = async (context, {productId, input}) => {
     }
 }
 
-const deleteImageOnProduct = async (context, {productId, id}) => {
+const deleteImageOnProduct = async (parent, {productId, id}, context) => {
     await Products.removeImage({id})
     return true
 }
